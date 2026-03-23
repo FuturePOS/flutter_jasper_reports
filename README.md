@@ -23,9 +23,9 @@ Before compiling or running your Flutter app, you **must build** the Java Native
 2. Build the Fat JAR using Gradle:
    ```bash
    gradle shadowJar
-   # or ./gradlew shadowJar if the wrapper is present
+   # or ./gradlew shadowJar if you use a wrapper
    ```
-3. A file named `jasper-generator-1.0-SNAPSHOT.jar` will be generated inside `java/build/libs/`.
+3. Copy the generated `jasper-generator-1.0-SNAPSHOT.jar` from `java/build/libs/` into the `assets/` directory at the root of this plugin project. If the directory doesn't exist, create it.
 
 ## 2. Installing via Git
 
@@ -43,7 +43,7 @@ dependencies:
 
 ## 3. Usage
 
-Inside your application, you must provide the compiled `.jar` file when invoking the plugin. Typically you add the `.jar` and `.jrxml` files to your Flutter assets, extract them to a temporary device folder at runtime, and provide absolute paths to the plugin.
+Inside your application, you can simply invoke the plugin! The required Java dependencies are bundled in the package assets automatically and extracted to your device temp folder at runtime.
 
 ```dart
 import 'package:flutter_jasper_reports/jasper_flutter_bridge.dart';
@@ -68,9 +68,6 @@ final pdfFile = await JasperFlutterBridge.exportPdf(
   
   // Required Output name
   outputFileName: "generated_report.pdf",
-  
-  // Absolute path to the JAR on the local filesystem
-  jarPath: "/absolute/path/to/extracted/jasper-generator-1.0-SNAPSHOT.jar"
 );
 
 print('Success! PDF saved to: ${pdfFile.path}');

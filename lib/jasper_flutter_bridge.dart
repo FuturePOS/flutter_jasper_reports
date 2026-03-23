@@ -41,18 +41,17 @@ class JasperFlutterBridge {
   /// The [parameters] are for high-level Jasper fields (like report title, Author, strings).
   /// The [dataList] is for the detail band records (List of Maps, simulating a database).
   /// The [outputFileName] is the final name of the generated PDF file.
-  /// The [jarPath] is the absolute path to the compiled Java Fat JAR containing Jasper dependencies.
   static Future<File> exportPdf({
     required String assetJrxmlPath,
     Map<String, dynamic>? parameters,
     List<Map<String, dynamic>>? dataList,
     required String outputFileName,
-    required String jarPath,
   }) async {
     // 1. Setup temporary directory for absolute paths
     final tempDir = await getTemporaryDirectory();
     final jrxmlFile = File('${tempDir.path}/temp_report.jrxml');
     final pdfFile = File('${tempDir.path}/$outputFileName');
+    final jarFile = File('${tempDir.path}/jasper-generator.jar');
 
     // 2. Load JRXML from assets and copy to temp directory
     final jrxmlData = await rootBundle.load(assetJrxmlPath);
@@ -60,18 +59,26 @@ class JasperFlutterBridge {
       jrxmlData.buffer.asUint8List(jrxmlData.offsetInBytes, jrxmlData.lengthInBytes)
     );
 
-    // 3. Prepare JSON data combining parameters and root list
+    // 3. Extract the bundled JAR from the plugin's assets automatically
+    if (!await jarFile.exists()) {
+      final jarData = await rootBundle.load('packages/flutter_jasper_reports/assets/jasper-generator-1.0-SNAPSHOT.jar');
+      await jarFile.writeAsBytes(
+        jarData.buffer.asUint8List(jarData.offsetInBytes, jarData.lengthInBytes)
+      );
+    }
+
+    // 4. Prepare JSON data combining parameters and root list
     final requestBody = {
       "parameters": parameters ?? {},
       "data": dataList ?? []
     };
     final jsonDataString = jsonEncode(requestBody);
 
-    // 4. Convert strings to native UTF-8 pointers
+    // 5. Convert strings to native UTF-8 pointers
     final jrxmlPointer = jrxmlFile.path.toNativeUtf8();
     final outPointer = pdfFile.path.toNativeUtf8();
     final jsonPointer = jsonDataString.toNativeUtf8();
-    final jarPointer = jarPath.toNativeUtf8();
+    final jarPointer = jarFile.path.toNativeUtf8();
 
     try {
       // 5. Invoke FFI C function
