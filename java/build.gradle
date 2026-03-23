@@ -1,0 +1,34 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'com.jasperbridge'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // JasperReports Core
+    implementation 'net.sf.jasperreports:jasperreports:6.20.6'
+    
+    // Jackson for JSON parsing
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+shadowJar {
+    archiveBaseName.set('jasper-generator')
+    archiveClassifier.set('')
+    archiveVersion.set('')
+    
+    // Merge SPI configurations (necessary for JasperReports dependencies)
+    mergeServiceFiles()
+}
