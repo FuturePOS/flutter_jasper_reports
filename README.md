@@ -37,8 +37,8 @@ dependencies:
     sdk: flutter
   flutter_jasper_reports:
     git:
-      url: https://github.com/your-username/flutter_jasper_reports.git
-      ref: main # (Optional) specify branch, tag, or commit hash
+      url: https://github.com/FuturePOS/flutter_jasper_reports.git
+      ref: master # (Optional) specify branch, tag, or commit hash
 ```
 
 ## 3. Usage
@@ -66,11 +66,18 @@ final pdfFile = await JasperFlutterBridge.exportPdf(
     {"itemName": "Product B", "price": 10.0, "qty": 5}
   ],
   
-  // Required Output name
+  // Required Output name (Will be saved to device's temporary directory)
   outputFileName: "generated_report.pdf",
 );
 
-print('Success! PDF saved to: ${pdfFile.path}');
+print('Success! PDF temporary file saved to: ${pdfFile.path}');
+
+// Example: Copying the PDF to your system's Documents Directory
+final docsDir = await getApplicationDocumentsDirectory();
+final permanentPath = '${docsDir.path}/generated_report.pdf';
+final finalPdfFile = await pdfFile.copy(permanentPath);
+
+print('Success! PDF permanently saved to: ${finalPdfFile.path}');
 ```
 
 ## Troubleshooting
