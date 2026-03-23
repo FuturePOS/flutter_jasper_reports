@@ -31,3 +31,9 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 /build/
 /coverage/
+
+# Java / Gradle related
+java/build/
+java/.gradle/
+java/gradle-8.5/
+java/gradle.zip
